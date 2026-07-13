@@ -1052,12 +1052,12 @@
         "Node name for S&R": "WanVideoBlockSwap"
       },
       "widgets_values": [
-        35,
-        false,
-        false,
+        40,
+        true,
+        true,
         true,
         0,
-        1,
+        0,
         false
       ],
       "color": "#223",
