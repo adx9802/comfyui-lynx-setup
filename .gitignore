@@ -1,0 +1,5 @@
+config.ps1
+*.log
+vs_BuildTools.exe
+__pycache__/
+.venv/
