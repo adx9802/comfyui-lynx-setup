@@ -58,6 +58,10 @@ Or copy `config.example.ps1` to `config.ps1`, edit paths, and dot-source before 
 - [ComfyUI-VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite)
 - [ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes)
 
+**Acceleration deps**
+- [triton-windows](https://github.com/woct0rdho/triton-windows) (`torch.compile` backend; pinned `<3.7` for torch 2.10/2.11)
+- [SageAttention](https://github.com/woct0rdho/SageAttention) (fast attention; the workflow's model loader uses `attention_mode=sageattn`)
+
 **Models (~35GB)**
 - Wan 2.1 T2V 14B (FP8 scaled)
 - Lynx lite IP + full ref layers + resampler
@@ -72,6 +76,15 @@ The bundled workflow uses:
 - 6 steps with LightX2V distilled LoRA
 
 ## Troubleshooting
+
+**`TritonMissing` / `No module named 'triton'` / `No module named 'sageattention'`**
+- The Lynx workflow uses `torch.compile` (needs Triton) and SageAttention. Install both prebuilt Windows wheels into the ComfyUI venv:
+```powershell
+& "D:\LocalAI\LocalAI\ComfyUI\.venv\Scripts\python.exe" -m pip install "triton-windows<3.7"
+& "D:\LocalAI\LocalAI\ComfyUI\.venv\Scripts\python.exe" -m pip install "https://github.com/woct0rdho/SageAttention/releases/download/v2.2.0-windows.post5/sageattention-2.2.0+cu130torch2.10.0andhigher.post5-cp310-abi3-win_amd64.whl"
+```
+- Match the wheel to your CUDA: use `cu130` for torch `+cu130`, `cu128` for torch `+cu12x`.
+- Alternative (no install): in the workflow, remove/bypass the Torch Compile settings node and set the model loader `attention_mode` to `sdpa`. Slower, but avoids Triton/SageAttention entirely.
 
 **numpy / compiler errors on Python 3.13**
 - The script installs VS 2022 C++ Build Tools automatically.

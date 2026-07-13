@@ -147,6 +147,30 @@ if ($LASTEXITCODE -ne 0) {
     Log "WARN: insightface install failed. Lynx still works with manual face crop."
 }
 
+# Triton + SageAttention: required by the Lynx workflow (torch.compile needs Triton,
+# and the WanVideo model loader is set to attention_mode=sageattn). Both ship as
+# prebuilt Windows wheels, so no local compilation is needed.
+Log "Installing Triton (triton-windows) and SageAttention..."
+$torchInfo = & $Python -c "import torch; print(torch.__version__.split('+')[0]); print((torch.version.cuda or '').replace('.',''))" 2>$null
+$torchVer = ($torchInfo | Select-Object -First 1)
+$cudaTag = ($torchInfo | Select-Object -Last 1)
+Log "Detected torch $torchVer / CUDA tag cu$cudaTag"
+
+# Triton minor version is pinned per torch minor version; <3.7 resolves to 3.6.x for torch 2.10/2.11.
+& $Python -m pip install "triton-windows<3.7" 2>&1 | ForEach-Object { Log $_ }
+if ($LASTEXITCODE -ne 0) {
+    Log "WARN: triton-windows install failed. torch.compile in the Lynx workflow will error (TritonMissing)."
+}
+
+# SageAttention ABI3 wheel from woct0rdho: torch2.10.0andhigher works for torch >= 2.10 / Python >= 3.10.
+if ($cudaTag -like "13*") { $sageCuda = "cu130" } else { $sageCuda = "cu128" }
+$sageWheel = "https://github.com/woct0rdho/SageAttention/releases/download/v2.2.0-windows.post5/sageattention-2.2.0+${sageCuda}torch2.10.0andhigher.post5-cp310-abi3-win_amd64.whl"
+Log "Installing SageAttention wheel: $sageWheel"
+& $Python -m pip install $sageWheel 2>&1 | ForEach-Object { Log $_ }
+if ($LASTEXITCODE -ne 0) {
+    Log "WARN: SageAttention install failed. Set attention_mode to sdpa in the WanVideo model loader, or check https://github.com/woct0rdho/SageAttention/releases for a matching wheel."
+}
+
 if (-not $SkipModels) {
     $pyPath = Join-Path $ScriptDir "download_models.py"
     if (-not (Test-Path $pyPath)) { Log "ERROR: download_models.py not found at $pyPath"; exit 1 }
