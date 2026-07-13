@@ -150,8 +150,9 @@ if ($LASTEXITCODE -ne 0) {
 if (-not $SkipModels) {
     $pyPath = Join-Path $ScriptDir "download_models.py"
     if (-not (Test-Path $pyPath)) { Log "ERROR: download_models.py not found at $pyPath"; exit 1 }
-    Log "Starting model downloads (~35GB)..."
-    & $Python $pyPath --models-root $ModelsRoot 2>&1 | ForEach-Object { Log $_ }
+    Log "Starting model downloads (~35GB)... (live progress bar shown in console)"
+    & $Python $pyPath --models-root $ModelsRoot
+    Log "Model download step finished (exit code $LASTEXITCODE)"
 } else {
     Log "Skipping model downloads (-SkipModels)."
 }
