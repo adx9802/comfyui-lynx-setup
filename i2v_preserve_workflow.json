@@ -20,7 +20,7 @@
   "4": {
     "class_type": "LoadImage",
     "inputs": {
-      "image": "IMG_1698.jpg"
+      "image": "c:\\Users\\aho\\Downloads\\IMG_1698.jpg"
     }
   },
   "6": {
@@ -49,7 +49,7 @@
     "inputs": {
       "model_name": "umt5-xxl-enc-bf16.safetensors",
       "precision": "bf16",
-      "positive_prompt": "the subject stays in the same place with the same background, subtle natural motion, gentle head and hair movement, cinematic, high quality",
+      "positive_prompt": "she is licking a lollipop",
       "negative_prompt": "new scene, different background, camera cut, teleport, morphing, distorted face, extra limbs, low quality, blurry, jpeg artifacts, watermark, text",
       "quantization": "disabled",
       "use_disk_cache": true,

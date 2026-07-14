@@ -1,26 +1,36 @@
 """Build + run a Wan2.1 Fun-InP image-to-video workflow that PRESERVES the input
 picture (background, face, styling) as the first frame and animates from it.
 
-Usage:
-  python _run_i2v.py [image] [width] [height] [frames] [steps] [start_latent_strength] [noise_aug]
+Usage examples:
+  python _run_i2v.py --prompt "she smiles and looks around"
+  python _run_i2v.py --image IMG_1698.jpg --prompt "..." --negative "..." --frames 81
+  python _run_i2v.py -p "gentle wind, hair moving" --start-latent 0.85 --noise-aug 0.03
 
 The prompt graph is also written to i2v_preserve_workflow.json (API format).
 """
-import json, time, urllib.request, urllib.error, uuid, sys, functools
+import json, time, urllib.request, urllib.error, uuid, sys, functools, argparse
 
 print = functools.partial(print, flush=True)
 SERVER = "http://127.0.0.1:8188"
 
-IMAGE   = sys.argv[1] if len(sys.argv) > 1 else "IMG_1698.jpg"
-W       = int(sys.argv[2]) if len(sys.argv) > 2 else 512
-H       = int(sys.argv[3]) if len(sys.argv) > 3 else 512
-FRAMES  = int(sys.argv[4]) if len(sys.argv) > 4 else 81
-STEPS   = int(sys.argv[5]) if len(sys.argv) > 5 else 25
-START_LATENT_STR = float(sys.argv[6]) if len(sys.argv) > 6 else 1.0   # 1.0 = strongest adherence to the photo
-NOISE_AUG        = float(sys.argv[7]) if len(sys.argv) > 7 else 0.0   # small >0 adds a bit of motion
+DEFAULT_POS = "the subject stays in the same place with the same background, subtle natural motion, gentle head and hair movement, cinematic, high quality"
+DEFAULT_NEG = "new scene, different background, camera cut, teleport, morphing, distorted face, extra limbs, low quality, blurry, jpeg artifacts, watermark, text"
 
-POS = "the subject stays in the same place with the same background, subtle natural motion, gentle head and hair movement, cinematic, high quality"
-NEG = "new scene, different background, camera cut, teleport, morphing, distorted face, extra limbs, low quality, blurry, jpeg artifacts, watermark, text"
+ap = argparse.ArgumentParser(description="Run image-to-video that preserves the input picture.")
+ap.add_argument("-p", "--prompt", default=DEFAULT_POS, help="Custom positive prompt (describe the motion you want).")
+ap.add_argument("-n", "--negative", default=DEFAULT_NEG, help="Custom negative prompt.")
+ap.add_argument("--image", default="IMG_1698.jpg", help="Start image filename in the ComfyUI input folder.")
+ap.add_argument("--width", type=int, default=512)
+ap.add_argument("--height", type=int, default=512)
+ap.add_argument("--frames", type=int, default=81)
+ap.add_argument("--steps", type=int, default=25)
+ap.add_argument("--start-latent", type=float, default=1.0, help="1.0 = strongest adherence to the photo; lower = more motion.")
+ap.add_argument("--noise-aug", type=float, default=0.0, help="Small >0 (e.g. 0.03) adds a bit of motion.")
+args = ap.parse_args()
+
+IMAGE, W, H, FRAMES, STEPS = args.image, args.width, args.height, args.frames, args.steps
+START_LATENT_STR, NOISE_AUG = args.start_latent, args.noise_aug
+POS, NEG = args.prompt, args.negative
 
 prompt = {
     "1": {"class_type": "WanVideoModelLoader", "inputs": {
