@@ -3,3 +3,4 @@ config.ps1
 vs_BuildTools.exe
 __pycache__/
 .venv/
+images/olivia.jpg
