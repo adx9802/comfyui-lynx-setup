@@ -671,8 +671,7 @@
           "name": "ref_image",
           "type": "IMAGE",
           "links": [
-            114,
-            137
+            114
           ]
         }
       ],
@@ -821,7 +820,7 @@
       ],
       "flags": {},
       "order": 17,
-      "mode": 0,
+      "mode": 4,
       "inputs": [
         {
           "name": "prev_model",
@@ -1017,9 +1016,9 @@
         "Node name for S&R": "WanVideoEmptyEmbeds"
       },
       "widgets_values": [
-        832,
-        480,
-        121
+        640,
+        368,
+        81
       ]
     },
     {
@@ -1055,7 +1054,7 @@
         40,
         true,
         true,
-        true,
+        false,
         0,
         0,
         false
@@ -1234,7 +1233,7 @@
           "name": "ref_image",
           "shape": 7,
           "type": "IMAGE",
-          "link": 137
+          "link": null
         },
         {
           "name": "ref_text_embed",
@@ -1608,14 +1607,6 @@
       55,
       4,
       "WANVIDEOTEXTEMBEDS"
-    ],
-    [
-      137,
-      53,
-      1,
-      55,
-      3,
-      "IMAGE"
     ],
     [
       139,
